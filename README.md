@@ -1,4 +1,4 @@
-# Gnome SHELL Most Important Task Extension
+# GNOME Shell Extension Most Important Task
 
 ## install
 
@@ -9,4 +9,4 @@ $ git clone git@github.com:dukex/gnome-shell-most-important-task-extension.git ~
 
 ## usage
 
-in Todoist, add the tag `mit` to your Most important tasks
+in Todoist, add the tag `mit` to your Most important tasks.
