@@ -15,12 +15,12 @@ const Account = new Lang.Class({
     const access_token = client.get_accounts()
       .filter(a => a.get_account().provider_type === 'todoist')
       .map(function(account) {
-        return account.get_oauth2_based().call_get_access_token_sync(null)
+        return account.get_oauth2_based().call_get_access_token_sync(null);
       })
       .map(function(result) {
         let [, access_token, ] = result;
         return access_token;
-      })
+      });
 
     return access_token[0];
   }
@@ -37,9 +37,10 @@ function request(method, path, params, fn) {
       if (message.status_code !== 200)
         return;
       let json = JSON.parse(message.response_body.data);
-      fn(json)
+
+      fn(json);
     }
-  ))
+  ));
 }
 
 function refresh() {
@@ -50,7 +51,11 @@ function refresh() {
 
   request("GET", "tasks", { filter: "@mit & (today | overdue)" }, function(tasks) {
     task = tasks.sort((a,b) => new Date(a.due.date) - new Date(b.due.date))[0];
-    label.set_text(task.content);
+    if(task) {
+      label.set_text(task.content);
+    } else {
+      label.set_text("Definir M.I.T.");
+    }
   });
 
   _timeout = Mainloop.timeout_add_seconds(60, Lang.bind(this, refresh));
@@ -73,15 +78,17 @@ function init() {
   label = new St.Label({ text: "Loading..." });
   button.set_child(label);
   button.connect('button-press-event', function() {
-    let file = imports.gi.Gio.File.new_for_uri(task.url)
-    file.query_exists(null)
-    file.query_default_handler(null).launch([file], null)
+    if(task) {
+      let file = imports.gi.Gio.File.new_for_uri(task.url);
+      file.query_exists(null);
+      file.query_default_handler(null).launch([file], null);
+    }
   });
 }
 
 function enable() {
   Main.panel._centerBox.insert_child_at_index(button, 0);
-  refresh()
+  refresh();
 }
 
 function disable() {
