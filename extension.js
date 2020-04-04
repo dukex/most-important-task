@@ -47,41 +47,28 @@ const fetchTask = (query) => {
   });
 }
 
-const asyncFetchTask = (query) => {
-  return (e) => {
-    log("query:");
-    log(query);
 
-    log("error:");
-    log(e);
-    return fetchTask(query);
+var setText = task => {
+  if(task) {
+    label.set_text(task.content);
+    return true;
+  } else {
+    throw false;
   }
 }
-
-  var setText = task => {
-    if(task) {
-      label.set_text(task.content);
-      return nil;
-    } else {
-      throw false;
-    }
-  }
 
 
 function assignTask() {
   fetchTask("@mit & (today | overdue)")
-  .then(setText, () => {
-    fetchTask("#READ")
     .then(setText, () => {
-      fetchTask("7 days")
-      .then(setText, () => {
-        fetchTask("assigned to: me")
-        .then(setText, () => {
-          setText("=)");
-        });
-      });
+      return fetchTask("7 days")
+    })
+    .then(setText, (f) => {
+      return fetchTask("assigned to: me")
+    })
+    .then(setText, () => {
+      setText({ content: "=)" });
     });
-  });
 }
 
 function refresh() {
