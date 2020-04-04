@@ -23,7 +23,6 @@ const request = (method, path, params) => {
             if (response.status_code !== 200)
                 return reject(response);
 
-
             let json = JSON.parse(response.response_body.data);
 
             return resolve(json);
@@ -34,14 +33,13 @@ const request = (method, path, params) => {
 const fetchTask = query => {
     return new Promise((resolve, reject) => {
         request('GET', 'tasks', { filter: query })
-      .then(tasks => {
-          const task = tasks.sort((a, b) => new Date(a.due.date) - new Date(b.due.date))[0];
-          if (task)
-              resolve(task);
-          else
-              reject(task);
-
-      }, reject);
+        .then(tasks => {
+            const task = tasks.sort((a, b) => new Date(a.due.date) - new Date(b.due.date))[0];
+            if (task)
+                resolve(task);
+            else
+                reject(task);
+        }, reject);
     });
 };
 
@@ -53,25 +51,29 @@ var setTask = task => {
             log(JSON.stringify(currentTask));
         }
 
-
         label.set_text(task.content);
-        return true;
+        return task;
     } else {
         throw task;
     }
 };
 
+var logRejectionError = fn => error => {
+    log(`rejected: ${JSON.stringify(error)}`);
+    fn(error);
+};
+
 function assignTask() {
     fetchTask('@mit & (today | overdue)')
-    .then(setTask, () => {
+    .then(setTask, logRejectionError(() => {
         return fetchTask('7 days');
-    })
-    .then(setTask, () => {
+    }))
+    .then(setTask, logRejectionError(() => {
         return fetchTask('assigned to: me');
-    })
-    .then(setTask, () => {
+    }))
+    .then(setTask, logRejectionError(() => {
         setTask({ content: '=)' });
-    });
+    }));
 }
 
 function refresh() {
