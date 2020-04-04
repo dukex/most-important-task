@@ -1,5 +1,10 @@
 # Most Important Task - GNOME Shell Extension
 
+## Screenshot
+
+![screenshot](images/screenshot.png)
+
+
 ## Installation
 
 
@@ -41,7 +46,3 @@ Given the previous filter doesn't match any task, a new search will be made:
 Given the previous filter doesn't match any task, a new search will be made:
 
 - Assigned to you (`assigned to: me`)
-
-## Screenshot
-
-![screenshot](https://user-images.githubusercontent.com/91538/47768073-29022d80-dcb5-11e8-886b-54284036701c.png)
