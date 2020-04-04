@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+yarn install
+yarn run eslint *.js
+
+rm -Rf mit@emersonalmeida.wtf.shell-extension.zip
+gnome-extensions pack
