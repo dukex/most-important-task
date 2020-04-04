@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.mit" path="/org/gnome/shell/extensions/mit/">
+    <!-- The key type "a{sb}" describes a dictionary of string-boolean pairs -->
+    <!-- See also: https://developer.gnome.org/glib/stable/gvariant-format-strings.html -->
+    <key name="todoist-api-token" type="s">
+      <default>""</default>
+      <summary>Your Todoist API Token</summary>
+      <description></description>
+    </key>
+  </schema>
+</schemalist>
