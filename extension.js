@@ -2,33 +2,21 @@ const St = imports.gi.St;
 const Main = imports.ui.main;
 const Soup = imports.gi.Soup;
 const Mainloop = imports.mainloop;
-const Goa = imports.gi.Goa;
+const Gio = imports.gi.Gio;
+const Me = imports.misc.extensionUtils.getCurrentExtension();
+
+let settings;
 
 class Account {
   get_token() {
-    const client = Goa.Client.new_sync(null);
-
-    log("client:");
-    log(client);
-
-    const access_token = client.get_accounts()
-      .map(a => {
-        log("provider_type:");
-        log(a.get_account().provider_type);
-        return a;
-      })
-      .filter(a => a.get_account().provider_type === 'todoist')
-      .map(account => account.get_oauth2_based().call_get_access_token_sync(null))
-      .map(([, access_token, ]) => access_token);
-
-    return access_token[0];
+    return settings.get_string('todoist-api-token');
   }
 }
 
 let button, label, account, _timeout, _httpSession;
 
 const request = (method, path, params) => {
-  const message = Soup.form_request_new_from_hash(method, `https://beta.todoist.com/API/v8/${path}`, params);
+  const message = Soup.form_request_new_from_hash(method, `https://api.todoist.com/rest/v1/${path}`, params);
   message.request_headers.append("Authorization", `Bearer ${account.get_token()}`);
 
   return new Promise((resolve, reject) => {
@@ -110,6 +98,16 @@ function refresh() {
 }
 
 function init() {
+  let gschema = Gio.SettingsSchemaSource.new_from_directory(
+    Me.dir.get_child('schemas').get_path(),
+    Gio.SettingsSchemaSource.get_default(),
+    false
+  );
+
+  settings = new Gio.Settings({
+    settings_schema: gschema.lookup('org.gnome.shell.extensions.mit', true)
+  });
+
   account = new Account();
 
   _httpSession = new Soup.Session();
