@@ -7,7 +7,7 @@
 
 ```
 $ mkdir -p ~/.local/share/gnome-shell/extensions/
-$ git clone git@github.com:dukex/gnome-shell-most-important-task-extension.git ~/.local/share/gnome-shell/extensions/mit@emersonalmeida.wtf
+$ git clone git@github.com:dukex/most-important-task.git ~/.local/share/gnome-shell/extensions/mit@emersonalmeida.wtf
 ```
 
 ## Usage
