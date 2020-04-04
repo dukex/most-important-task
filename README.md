@@ -1,13 +1,16 @@
-# GNOME Shell Extension Most Important Task
+# Most Important Task - GNOME Shell Extension
 
-## install
+## Installation
+
+
+### Manual
 
 ```
 $ mkdir -p ~/.local/share/gnome-shell/extensions/
-$ git clone git@github.com:dukex/gnome-shell-most-important-task-extension.git ~/.local/share/gnome-shell/extensions/emersonalmeidax+mit-ext@gmail.com
+$ git clone git@github.com:dukex/gnome-shell-most-important-task-extension.git ~/.local/share/gnome-shell/extensions/mit@emersonalmeida.wtf
 ```
 
-## usage
+## Usage
 
 in Todoist, add the tag `mit` to your Most important tasks.
 
