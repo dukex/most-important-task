@@ -33,16 +33,16 @@ In [todoist.com/prefs/integrations](https://todoist.com/prefs/integrations) copy
 ![](images/mit-settings.png)
 
 
-#### Filters
+#### Rules
 
-To get the *most important task*, the task should:
+To get the *most important task*, you can set a prioritized rules, a rule can be any [Todoist Search filter](https://todoist.com/help/articles/introduction-to-filters)
 
-- Has label "mit" and scheduled to today or be overdue (`@mit & (today | overdue)`)
+To get an idea about rules, a good start can be:
 
-Given the previous filter doesn't match any task, a new search will be made:
-
-- Schedule to the next 7 days (`7 days`)
-
-Given the previous filter doesn't match any task, a new search will be made:
-
-- Assigned to you (`assigned to: me`)
+- overdue & p1
+- overdue
+- today & p1
+- today
+- p1 & no date
+- p2 & no date
+- (p3 | p4) & no date
