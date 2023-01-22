@@ -4,7 +4,10 @@
   "description": "Show your Most Important Task in Status Bar",
   "uuid": "mit@emersonalmeida.wtf",
   "shell-version": [
-    "3.30.1"
+    "40",
+    "41",
+    "42",
+    "43"
   ],
   "url": "https://dukex.github.io/most-important-task"
 }
