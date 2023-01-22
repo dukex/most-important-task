@@ -21,66 +21,69 @@ class Account {
     return settings.get_string("todoist-api-token");
   }
 
-  getSearch() {
-    return settings.get_string("todoist-search");
-  }
-
   getRules() {
-    return settings.get_strv('todoist-search-rules')
+    return settings.get_strv("todoist-search-rules");
   }
 }
 
-const logTodoist = (message) => log("[mit@emersonalmeidax.wtf]["+ new Date() +"] " + message);
+const logTodoist = (message) =>
+  log("[mit@emersonalmeidax.wtf][" + new Date() + "] " + message);
 
 const request = (method, path, params) => {
   return new Promise((resolve, reject) => {
     try {
+      logTodoist("todoist: request(" + method + ", " + path + ", " + params);
 
-    logTodoist("todoist: request(" + method + ", " + path + ", " + params);
+      const query = Soup.form_encode_hash(params); //Object.keys(params).map((key) => `${key}=${params[key]}`).join("&")
 
-    const query = Soup.form_encode_hash(params); //Object.keys(params).map((key) => `${key}=${params[key]}`).join("&")
+      logTodoist(
+        "curl -X" +
+          method +
+          " -H 'Authorization: " +
+          `Bearer ${account.getToken()}' ` +
+          ` 'https://api.todoist.com/rest/v2/${path}?${query}'`
+      );
 
-    logTodoist(
-      "curl -X" +
-        method +
-        " -H 'Authorization: " +
-        `Bearer ${account.getToken()}' ` +
-        ` 'https://api.todoist.com/rest/v2/${path}?${query}'`
-    );
+      const message = Soup.Message.new_from_encoded_form(
+        method,
+        `https://api.todoist.com/rest/v2/${path}`,
+        query
+      );
 
-    const message = Soup.Message.new_from_encoded_form(
-      method,
-      `https://api.todoist.com/rest/v2/${path}`,
-      query
-    );
+      logTodoist("message" + message);
 
-    logTodoist("message" + message);
+      message.request_headers.append(
+        "Authorization",
+        `Bearer ${account.getToken()}`
+      );
 
-    message.request_headers.append(
-      "Authorization",
-      `Bearer ${account.getToken()}`
-    );
+      _httpSession.send_and_read_async(
+        message,
+        1000,
+        cancellable,
+        (source, result) => {
+          logTodoist("hello");
 
-    const bytes = _httpSession.send_and_read(message, cancellable);
+          const bytes = _httpSession.send_and_read_finish(result);
+          decoder = new TextDecoder();
 
-    decoder = new TextDecoder()
-
-    logTodoist("bytesL: " + bytes)
-    json = JSON.parse(decoder.decode(bytes.get_data()));
-    logTodoist("json"  + json);
-    resolve(json)
-
-  } catch (error) {
-    logTodoist("error" + error)
-    reject(error)
-  }
+          logTodoist("bytesL: " + bytes);
+          body = decoder.decode(bytes.get_data());
+          logTodoist(body);
+          json = JSON.parse(body);
+          logTodoist("json" + json);
+          resolve(json);
+        }
+      );
+    } catch (error) {
+      logTodoist("error" + error);
+      reject(error);
+    }
   });
 };
 
 const fetchTask = (query) => {
   logTodoist("todoist: fetchTask()");
-
-
 
   return new Promise((resolve, reject) => {
     request("GET", "tasks", { filter: query }).then((tasks) => {
@@ -93,14 +96,14 @@ const fetchTask = (query) => {
   });
 };
 
-var setTask = (task) => {
+var setTask = (rule) => (task) => {
   if (task) {
     if (task.url) {
       currentTask = task;
       logTodoist(JSON.stringify(currentTask));
     }
 
-    label.set_text(task.content);
+    label.set_text(rule + ": "+ task.content);
     return task;
   } else {
     throw task;
@@ -112,30 +115,37 @@ var logTodoistRejectionError = (fn) => (error) => {
   fn(error);
 };
 
+const tryToGetTask = (rules) => {
+  return new Promise((resolve, reject) => {
+    const rule = rules.shift();
+
+    if (rule) {
+      logTodoist("rule: " + rule);
+
+      const query = rule.replace("overdue", "due before:"+ (new Date()).toLocaleDateString())
+
+      fetchTask(query)
+        .then(
+          setTask(rule),
+          logTodoistRejectionError(() => {
+            return tryToGetTask(rules);
+          })
+        )
+        .then(resolve, reject);
+    } else {
+      logTodoist("no rules");
+      reject("no rules");
+    }
+  });
+};
+
 function assignTask() {
+  const rules = account.getRules();
 
-
-  logTodoist(typeof account.getRules());
-
-  fetchTask(account.getSearch())
-    .then(
-      setTask,
-      logTodoistRejectionError(() => {
-        return fetchTask("7 days");
-      })
-    )
-    .then(
-      setTask,
-      logTodoistRejectionError(() => {
-        return fetchTask("assigned to: me");
-      })
-    )
-    .then(
-      setTask,
-      logTodoistRejectionError(() => {
-        setTask({ content: "=)" });
-      })
-    );
+  tryToGetTask(rules).catch((e) => {
+    logTodoist(e);
+    setTask({ content: "=)" });
+  });
 }
 
 function refresh() {
@@ -170,15 +180,13 @@ function enable() {
   });
 
   account = new Account();
-  cancellable = new Gio.Cancellable()
+  cancellable = new Gio.Cancellable();
   _httpSession = new Soup.Session();
 
   button = new St.Button({
     style_class: "panel-button",
     reactive: true,
     can_focus: true,
-    // x_fill: true,
-    // y_fill: false,
     track_hover: true,
   });
 
@@ -209,7 +217,7 @@ function disable() {
 
   cancellable.cancel();
 
-  cancellable = null
+  cancellable = null;
   _httpSession = null;
   account = null;
   button = null;

@@ -7,12 +7,6 @@
       <description></description>
     </key>
 
-    <key name="todoist-search" type="s">
-      <default>"@mit &amp; (today | overdue)"</default>
-      <summary>Your Todoist Search</summary>
-      <description></description>
-    </key>
-
     <key name="todoist-search-rules" type="as">
       <default>[]</default>
       <summary>Your Todoist Search Rules</summary>
