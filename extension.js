@@ -209,7 +209,7 @@ function enable() {
 
 function disable() {
   _httpSession.abort();
-  // Main.panel._centerBox.remove_child(button);
+  Main.panel._centerBox.remove_child(button);
   if (_timeout) {
     GLib.source_remove(_timeout);
     _timeout = null;
