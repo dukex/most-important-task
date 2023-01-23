@@ -122,7 +122,7 @@ const tryToGetTask = (rules) => {
     if (rule) {
       logTodoist("rule: " + rule);
 
-      const query = rule.replace("overdue", "due before:"+ (new Date()).toLocaleDateString())
+      const query = rule.replace("overdue", "due before:"+ GLib.DateTime.new_now_local().format("%d/%m/%Y %H:%M"))
 
       fetchTask(query)
         .then(
