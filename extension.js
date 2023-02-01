@@ -14,7 +14,8 @@ let settings,
   _httpSession,
   gschema,
   cancellable,
-  currentTask;
+  currentTask,
+  reloadButton;
 
 class Account {
   getToken() {
@@ -203,13 +204,34 @@ function enable() {
   });
 
   Main.panel._centerBox.insert_child_at_index(button, 0);
+
+
+  reloadButton = new St.Button({
+    style_class: "panel-button",
+    reactive: true,
+    can_focus: true,
+    track_hover: true,
+  });
+  reloadLabel = new St.Label({ text: "[ r ]" });
+  reloadButton.set_child(reloadLabel);
+  reloadButton.connect("button-press-event", () => {
+    refresh();
+  });
+
+  Main.panel._centerBox.insert_child_at_index(reloadButton, 0);
+
+
   logTodoist("enable");
+
+
+
   refresh();
 }
 
 function disable() {
   _httpSession.abort();
   Main.panel._centerBox.remove_child(button);
+  Main.panel._centerBox.remove_child(reloadButton);
   if (_timeout) {
     GLib.source_remove(_timeout);
     _timeout = null;
@@ -221,6 +243,7 @@ function disable() {
   _httpSession = null;
   account = null;
   button = null;
+  reloadButton = null;
   currentTask = null;
   gschema = null;
   label = null;
