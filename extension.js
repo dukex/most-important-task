@@ -104,7 +104,7 @@ var setTask = (rule) => (task) => {
       logTodoist(JSON.stringify(currentTask));
     }
 
-    label.set_text(rule + ": "+ task.content);
+    label.set_text(rule + ": " + task.content);
     return task;
   } else {
     throw task;
@@ -123,7 +123,10 @@ const tryToGetTask = (rules) => {
     if (rule) {
       logTodoist("rule: " + rule);
 
-      const query = rule.replace("overdue", "due before:"+ GLib.DateTime.new_now_local().format("%d/%m/%Y %H:%M"))
+      const query = rule.replace(
+        "overdue",
+        "due before:" + GLib.DateTime.new_now_local().format("%m/%d/%Y %H:%M")
+      );
 
       fetchTask(query)
         .then(
@@ -205,7 +208,6 @@ function enable() {
 
   Main.panel._centerBox.insert_child_at_index(button, 0);
 
-
   reloadButton = new St.Button({
     style_class: "panel-button",
     reactive: true,
@@ -220,10 +222,7 @@ function enable() {
 
   Main.panel._centerBox.insert_child_at_index(reloadButton, 0);
 
-
   logTodoist("enable");
-
-
 
   refresh();
 }
